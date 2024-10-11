@@ -6,13 +6,11 @@ import org.anil.model.Movie;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
+
 
 public class Service {
 
@@ -44,19 +42,5 @@ public class Service {
         }
     }
 }
-
-
-//
-//        return lines.skip(1)
-//                .map(str -> str.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1))
-//                .map(arr -> new Movie(
-//                        arr[0],
-//                        arr[1],
-//                        arr[2],
-//                        Pattern.compile(",").splitAsStream(arr[3]).map(s->s.trim()).toList(),
-//                        Pattern.compile(",").splitAsStream(arr[4]).map(s->s.trim()).toList(),
-//                        arr[5] ,
-//                        Integer.parseInt(arr[7].toString())))
-//                .toList();
 
 
