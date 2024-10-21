@@ -3,10 +3,9 @@ package org.anil;
 import com.opencsv.exceptions.CsvValidationException;
 import org.anil.model.YoutubeStats;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -69,6 +68,25 @@ public class Q3 {
         System.out.println(answer4);
 
 
+        youtubeStats.stream()
+                .map(a -> a.title())
+                .collect(
+
+                                        () -> new ArrayList<String>(),
+                                        (list, s) -> list.add(s),
+                                        (list1, list2) -> list1.addAll(list2)
+                        );
+
+       var answer =  youtubeStats.stream()
+
+                .max(Comparator.comparing(a->a.views()))
+                .get();
+        System.out.println(ans);
+
+
+        var ans1 = youtubeStats.stream()
+                .max(Comparator.comparing(stat -> stat.views()))
+                        .get();
 
     }
 }
