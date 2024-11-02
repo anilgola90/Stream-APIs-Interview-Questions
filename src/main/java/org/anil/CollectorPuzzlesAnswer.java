@@ -9,7 +9,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 /**
@@ -19,6 +26,8 @@ import java.util.regex.Pattern;
  * named "reader" that the test has set up for you.
  */
 public class CollectorPuzzlesAnswer {
+
+
 
 
     /**
@@ -33,13 +42,15 @@ public class CollectorPuzzlesAnswer {
      */
     @Test
     public void o_harderCollector01() {
+        Map<Integer, List<String>> result = reader.lines()
+                .flatMap(s -> SPLIT_PATTERN.splitAsStream(s))
+                .collect(Collectors.groupingBy(String::length));
 
-
-//        assertThat(result).hasSize(11);
-//        assertThat(result.get(8)).containsExactly("increase", "beauty's", "ornament");
-//        assertThat(result.get(9)).containsExactly("creatures", "abundance");
-//        assertThat(result.get(10)).containsExactly("contracted", "niggarding");
-//        assertThat(result.get(11)).containsExactly("substantial");
+        assertThat(result).hasSize(11);
+        assertThat(result.get(8)).containsExactly("increase", "beauty's", "ornament");
+        assertThat(result.get(9)).containsExactly("creatures", "abundance");
+        assertThat(result.get(10)).containsExactly("contracted", "niggarding");
+        assertThat(result.get(11)).containsExactly("substantial");
     }
 
 
@@ -55,20 +66,22 @@ public class CollectorPuzzlesAnswer {
     @Test
     public void o_harderCollector02() {
 
+        Map<Integer, Long> result = reader.lines()
+                .flatMap(s -> SPLIT_PATTERN.splitAsStream(s))
+                .collect(Collectors.groupingBy(String::length, Collectors.counting()));
 
-
-//        assertThat(result).hasSize(11);
-//        assertThat(result.get(1)).isEqualTo(1L);
-//        assertThat(result.get(2)).isEqualTo(11L);
-//        assertThat(result.get(3)).isEqualTo(28L);
-//        assertThat(result.get(4)).isEqualTo(21L);
-//        assertThat(result.get(5)).isEqualTo(16L);
-//        assertThat(result.get(6)).isEqualTo(12L);
-//        assertThat(result.get(7)).isEqualTo(10L);
-//        assertThat(result.get(8)).isEqualTo(3L);
-//        assertThat(result.get(9)).isEqualTo(2L);
-//        assertThat(result.get(10)).isEqualTo(2L);
-//        assertThat(result.get(11)).isEqualTo(1L);
+        assertThat(result).hasSize(11);
+        assertThat(result.get(1)).isEqualTo(1L);
+        assertThat(result.get(2)).isEqualTo(11L);
+        assertThat(result.get(3)).isEqualTo(28L);
+        assertThat(result.get(4)).isEqualTo(21L);
+        assertThat(result.get(5)).isEqualTo(16L);
+        assertThat(result.get(6)).isEqualTo(12L);
+        assertThat(result.get(7)).isEqualTo(10L);
+        assertThat(result.get(8)).isEqualTo(3L);
+        assertThat(result.get(9)).isEqualTo(2L);
+        assertThat(result.get(10)).isEqualTo(2L);
+        assertThat(result.get(11)).isEqualTo(1L);
     }
 
 
@@ -83,14 +96,22 @@ public class CollectorPuzzlesAnswer {
     @Test
     public void o_harderCollector03() {
 
-//        assertThat(result).hasSize(87);
-//        assertThat(result.get("tender")).isEqualTo(2L);
-//        assertThat(result.get("the")).isEqualTo(6L);
-//        assertThat(result.get("churl")).isEqualTo(1L);
-//        assertThat(result.get("thine")).isEqualTo(2L);
-//        assertThat(result.get("world")).isEqualTo(1L);
-//        assertThat(result.get("thy")).isEqualTo(4L);
-//        assertThat(result.get("self")).isEqualTo(3L);
+//        Map<String, Long> result = reader.lines()
+//                .flatMap(s -> SPLIT_PATTERN.splitAsStream(s))
+//                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        Map<String, Long> result = reader.lines()
+                .flatMap(s -> SPLIT_PATTERN.splitAsStream(s))
+                .collect(Collectors.toMap(s -> s, s -> 1L, (value1, value2) -> value1 + 1L));
+
+        assertThat(result).hasSize(87);
+        assertThat(result.get("tender")).isEqualTo(2L);
+        assertThat(result.get("the")).isEqualTo(6L);
+        assertThat(result.get("churl")).isEqualTo(1L);
+        assertThat(result.get("thine")).isEqualTo(2L);
+        assertThat(result.get("world")).isEqualTo(1L);
+        assertThat(result.get("thy")).isEqualTo(4L);
+        assertThat(result.get("self")).isEqualTo(3L);
     }
 
     /**
@@ -105,7 +126,19 @@ public class CollectorPuzzlesAnswer {
  
     @Test
     public void o_harderCollector04() {
-  //       assertThat(leastUsedLetter).isIn("v", "k");
+
+        Map.Entry<String, Long> stringLongEntry = reader.lines()
+                .flatMap(SPLIT_PATTERN::splitAsStream)
+                .flatMap(word -> word.chars().boxed())
+                .filter(s -> s >= 97)
+                .map(s -> Character.toString(s))
+                .collect(Collectors.groupingBy(s -> s, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue())
+                .get();
+         String leastUsedLetter = stringLongEntry.getKey();
+         assertThat(leastUsedLetter).isIn("v", "k");
     }
 
     /**
@@ -185,5 +218,8 @@ public class CollectorPuzzlesAnswer {
     @After
     public void z_closeBufferedReader() throws IOException {
         reader.close();
+
+
+
     }
 }

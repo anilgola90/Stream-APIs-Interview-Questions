@@ -21,15 +21,15 @@ public class Q2DirectorWithHighestMovies {
                 .collect(Collectors.groupingBy(directorName -> directorName, Collectors.counting()))
                 .entrySet()
                 .stream()
-                .collect(Collectors.groupingBy(entry -> entry.getValue(),
-                        Collectors.mapping(entry -> entry.getKey(), Collectors.toList())))
+                .collect(Collectors.groupingBy(Map.Entry::getValue,
+                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())))
                 .entrySet()
                 .stream()
                 .sorted(Comparator.comparing(entry -> -entry.getKey()))
                 .toList().get(0);
 
 
-        System.out.println(answer.getValue() + " have/has directed " + answer.getKey() + " movies");
+        System.out.println(STR."\{answer.getValue()} have/has directed \{answer.getKey()} movies");
 
 
     }
