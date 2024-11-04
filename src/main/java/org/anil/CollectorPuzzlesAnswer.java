@@ -9,14 +9,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -151,10 +155,29 @@ public class CollectorPuzzlesAnswer {
      */
     @Test
     public void o_harderCollector05() {
+        Map.Entry<Long, List<String>> collect = reader.lines()
+                .flatMap(SPLIT_PATTERN::splitAsStream)
+                .flatMap(word -> word.chars().boxed())
+                .map(Character::toString)
+                .map(String::toLowerCase)
+                .collect(Collectors.groupingBy(
+                        letter -> letter,
+                        Collectors.counting()
+                )).entrySet()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getValue,
+                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())
 
-
-//        assertThat(leastUsedLetters).hasSize(2);
-//        assertThat(leastUsedLetters).contains("v", "k");
+                ))
+                .entrySet()
+                .stream()
+                .min(Map.Entry.comparingByKey())
+                .get();
+        List<String> leastUsedLetters = collect.getValue();
+        System.out.println(leastUsedLetters);
+        assertThat(leastUsedLetters).hasSize(2);
+        assertThat(leastUsedLetters).contains("v", "k");
     }
 
 
@@ -165,22 +188,35 @@ public class CollectorPuzzlesAnswer {
      * word to a list of words with that length. Don't bother with any lowercasing
      * or uniquifying of the words.
      * <p>
-     * For example, given the words "foo bar baz bazz foo" the string
+     * For example, given the words "foo bar baz bazz foo first" the string
      * representation of the result would be:
-     * {b={3=[bar, baz], 4=[bazz]}, f={3=[foo, foo]}}
+     * {b={3=[bar, baz], 4=[bazz]}, f={3=[foo, foo], 4 = [first}}
      */
     @Test
     public void o_harderCollector06() {
 
-//        assertThat(result).hasSize(25);
-//        assertThat(result.get("a").get(9).toString()).isEqualTo("[abundance]");
-//        assertThat(result.get("b").get(2).toString()).isEqualTo("[by, be, by]");
-//        assertThat(result.get("f").get(5).toString()).isEqualTo("[flame, fresh]");
-//        assertThat(result.get("g").get(5).toString()).isEqualTo("[gaudy, grave]");
-//        assertThat(result.get("s").get(6).toString()).isEqualTo("[should, spring]");
-//        assertThat(result.get("s").get(11).toString()).isEqualTo("[substantial]");
-//        assertThat(result.get("t").get(3).toString()).isEqualTo("[the, thy, thy, thy, too, the, the, thy, the, the, the]");
-//        assertThat(result.get("w").get(5).toString()).isEqualTo("[where, waste, world]");
+       var result =   reader.lines()
+                 .flatMap(SPLIT_PATTERN::splitAsStream)
+                 .collect(
+                         Collectors.groupingBy(
+                                 word -> word.substring(0,1),
+                                 Collectors.groupingBy(
+                                         String::length,
+                                         Collectors.toList()
+                                 )
+                         )
+                 );
+
+
+        assertThat(result).hasSize(25);
+        assertThat(result.get("a").get(9).toString()).isEqualTo("[abundance]");
+        assertThat(result.get("b").get(2).toString()).isEqualTo("[by, be, by]");
+        assertThat(result.get("f").get(5).toString()).isEqualTo("[flame, fresh]");
+        assertThat(result.get("g").get(5).toString()).isEqualTo("[gaudy, grave]");
+        assertThat(result.get("s").get(6).toString()).isEqualTo("[should, spring]");
+        assertThat(result.get("s").get(11).toString()).isEqualTo("[substantial]");
+        assertThat(result.get("t").get(3).toString()).isEqualTo("[the, thy, thy, thy, too, the, the, thy, the, the, the]");
+        assertThat(result.get("w").get(5).toString()).isEqualTo("[where, waste, world]");
     }
 
 
@@ -191,10 +227,16 @@ public class CollectorPuzzlesAnswer {
      */
     @Test
     public void o_harderCollector07() {
+        IntStream input = new Random(987523).ints(20, 0, 100);
 
+         var answer =  input.boxed()
+                  .collect(
+                  Collectors.partitioningBy(s -> s%2 == 0,Collectors.summingInt(s -> s)));
 
-//        assertEquals(516, sumEvens);
-//        assertEquals(614, sumOdds);
+       int sumEvens =  answer.get(true);
+       int sumOdds = answer.get(false);
+        assertEquals(516, sumEvens);
+        assertEquals(614, sumOdds);
     }
 
 
